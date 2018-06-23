@@ -18,7 +18,7 @@ namespace DotNetCoreLinq2SQLite.Models
             {
                 _created = true;
                 //每次都删除原数据库
-                //Database.EnsureDeleted();
+                Database.EnsureDeleted();
                 //数据库不存在则创建
                 Database.EnsureCreated();
             }
@@ -31,7 +31,8 @@ namespace DotNetCoreLinq2SQLite.Models
             //表不存在时，自动创建数据表
             modelBuilder.Entity<Blog>().ToTable("Blogs");
             modelBuilder.Entity<Publisher>().ToTable("Publishers");
-            //TODO: 使用 modelBuilder.Entity<T>().HasData(new T() { /* ... */ }); 添加种子数据
+
+            //foreach (int Index = 1)
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionbuilder)
