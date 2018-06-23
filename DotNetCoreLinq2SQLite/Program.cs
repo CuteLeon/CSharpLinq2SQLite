@@ -9,22 +9,31 @@ namespace DotNetCoreLinq2SQLite
     {
         static void Main(string[] args)
         {
-            //CoreSQLiteDBContext BlogDBContext = new CoreSQLiteDBContext();
-            SampleDBContext BlogDBContext = new SampleDBContext();
-            //BlogDBContext.Blogs.Add(new Blog() { Content = "幽灵博客" });
-            BlogDBContext.Set<Publisher>().Add(new Publisher()
+            using (SampleDBContext BlogDBContext = new SampleDBContext())
             {
-                Name = "测试发布者",
-                Blogs = new List<Blog>() {
-                    new Blog() { Content="测试博客 A"},
-                    new Blog() { Content="测试博客 B"},
-                    new Blog() { Content="测试博客 C"},
-                }
-            });
-            //BlogDBContext.Blogs.Add(new Blog() { Content = "空降一篇博客", PublisherID=1});
-            BlogDBContext.SaveChanges();
-            Console.WriteLine("Blogs.Count : " + BlogDBContext.Blogs.Count().ToString());
-            Console.WriteLine("Publishers.Count : " + BlogDBContext.Publishers.Count().ToString());
+                BlogDBContext.Set<Publisher>().Add(new Publisher()
+                {
+                    Name = "测试发布者",
+                    Blogs = new List<Blog>() {
+                        new Blog() { Content="测试博客 A"},
+                        new Blog() { Content="测试博客 B"},
+                        new Blog() { Content="测试博客 C"},
+                    }
+                });
+                /* 存在外键约束，博客的PublisherID必须为数据库内当前已经存在的值，
+                 * 需要先保存发布者信息至数据库，否则下面空降博客会导致外键约束失败。
+                 */
+                BlogDBContext.SaveChanges();
+                BlogDBContext.Blogs.Add(new Blog() { Content = "空降一篇博客", PublisherID=1});
+                /* 存在外键约束，博客的PublisherID必须为数据库内当前已经存在的值，
+                 * 下面使用 PublisherID=10101 发布博客将会失败。
+                 */
+                //BlogDBContext.Blogs.Add(new Blog() { Content = "幽灵博客", PublisherID=10101});
+                BlogDBContext.SaveChanges();
+                Console.WriteLine("Blogs.Count : " + BlogDBContext.Blogs.Count().ToString());
+                Console.WriteLine("Publishers.Count : " + BlogDBContext.Publishers.Count().ToString());
+            }
+
             Console.Read();
         }
     }
