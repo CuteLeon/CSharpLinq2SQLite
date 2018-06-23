@@ -44,7 +44,7 @@ namespace DotNetCoreLinq2SQLite
                 Console.WriteLine("《测试博客 B》 的发布者为 : " + BlogDBContext.Blogs.First(Blog => Blog.Content == "测试博客 B").Publisher.Name);
                 //TODO: 遗留问题-1：通过种子数据添加的 BlogDBContext.Publishers.First(Publisher => Publisher.Name == "测试发布者").Blogs.Count 会输出 1 (应为4)
                 //Console.WriteLine($"测试发布者 发布了 {BlogDBContext.Blogs.Where(blog => blog.PublisherID == BlogDBContext.Publishers.FirstOrDefault(publisher => publisher.Name == "测试发布者").PublisherID).Count()} 篇博客。");
-                Console.WriteLine($"种子发布者-2 发布了 {BlogDBContext.Publishers.Include("Blogs").First(Publisher => Publisher.Name == "种子发布者-2")?.Blogs?.Count.ToString()??"*"} 篇博客。");
+                Console.WriteLine($"种子发布者-2 发布了 {BlogDBContext.Publishers.First(Publisher => Publisher.Name == "种子发布者-2")?.Blogs?.Count.ToString()??"*"} 篇博客。");
 
                 Console.WriteLine(string.Empty);
                 Console.WriteLine("Blogs.Count : " + BlogDBContext.Blogs.Count().ToString());
@@ -57,7 +57,7 @@ namespace DotNetCoreLinq2SQLite
                 Console.WriteLine(string.Empty);
                 Console.WriteLine("Publishers.Count : " + BlogDBContext.Publishers.Count().ToString());
                 Console.WriteLine("Publishers :");
-                foreach (Publisher publisher in BlogDBContext.Publishers.Include("Blogs"))
+                foreach (Publisher publisher in BlogDBContext.Publishers)
                     Console.WriteLine($"\t{publisher.Name} \t(ID : {publisher.PublisherID})\t发布数 : {publisher.Blogs.Count}");
             }
 

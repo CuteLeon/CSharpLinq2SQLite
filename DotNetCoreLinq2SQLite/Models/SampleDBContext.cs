@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Proxies;
 
 namespace DotNetCoreLinq2SQLite.Models
 {
@@ -27,7 +28,7 @@ namespace DotNetCoreLinq2SQLite.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             //表不存在时，自动创建数据表
             modelBuilder.Entity<Blog>().ToTable("Blogs");
             modelBuilder.Entity<Publisher>().ToTable("Publishers");
@@ -51,7 +52,10 @@ namespace DotNetCoreLinq2SQLite.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionbuilder)
         {
-            optionbuilder.UseSqlite(@"Data Source=CoreSQLiteDB.db");
+            //安装 Nuget : Microsoft.EntityFrameworkCore.Proxies
+            //启用 懒惰加载代理 解决因为懒加载导致的空对象问题
+            optionbuilder.UseLazyLoadingProxies().UseSqlite(@"Data Source=CoreSQLiteDB.db");
+            //optionbuilder.UseSqlite(@"Data Source=CoreSQLiteDB.db");
         }
     }
 }
