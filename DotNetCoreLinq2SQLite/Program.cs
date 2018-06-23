@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DotNetCoreLinq2SQLite.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCoreLinq2SQLite
 {
@@ -36,23 +37,28 @@ namespace DotNetCoreLinq2SQLite
                 //BlogDBContext.Blogs.Add(new Blog() { Content = "幽灵博客", PublisherID=10101});
                 BlogDBContext.SaveChanges();
 
+                //!!! 解决延迟加载导致空对象问题：在目标数据表后使用 .Include("扩展数据表") 包含扩展数据表即可，此方法包含在 Microsoft.EntityFrameworkCore 命名空间需要 using ;
+                //foreach (Publisher publisher in BlogDBContext.Publishers.Include("Blogs"))
+                //    Console.WriteLine(publisher.Name + " " + publisher.Blogs.Count);
+
                 Console.WriteLine("《测试博客 B》 的发布者为 : " + BlogDBContext.Blogs.First(Blog => Blog.Content == "测试博客 B").Publisher.Name);
                 //TODO: 遗留问题-1：通过种子数据添加的 BlogDBContext.Publishers.First(Publisher => Publisher.Name == "测试发布者").Blogs.Count 会输出 1 (应为4)
-                Console.WriteLine($"测试发布者 发布了 {BlogDBContext.Blogs.Where(blog => blog.PublisherID == BlogDBContext.Publishers.FirstOrDefault(publisher => publisher.Name == "测试发布者").PublisherID).Count()} 篇博客。");
+                //Console.WriteLine($"测试发布者 发布了 {BlogDBContext.Blogs.Where(blog => blog.PublisherID == BlogDBContext.Publishers.FirstOrDefault(publisher => publisher.Name == "测试发布者").PublisherID).Count()} 篇博客。");
+                Console.WriteLine($"种子发布者-2 发布了 {BlogDBContext.Publishers.Include("Blogs").First(Publisher => Publisher.Name == "种子发布者-2")?.Blogs?.Count.ToString()??"*"} 篇博客。");
 
                 Console.WriteLine(string.Empty);
                 Console.WriteLine("Blogs.Count : " + BlogDBContext.Blogs.Count().ToString());
                 Console.WriteLine("Blogs :");
                 //TODO: 遗留问题-2：通过种子数据添加的{blog.Publisher?.Name ?? "*"} 会输出 * (应为博客发布者名称)
-                //Console.WriteLine($"\t{blog.Content} \tvia : {blog.Publisher?.Name ?? "*"}\t(ID : {blog.PublisherID})");
                 foreach (Blog blog in BlogDBContext.Blogs)
-                    Console.WriteLine($"\t{blog.Content} \tvia : {BlogDBContext.Publishers.First(publisher => publisher.PublisherID == blog.PublisherID).Name}\t(ID : {blog.PublisherID})");
+                    Console.WriteLine($"\t{blog.Content} \tvia : {blog.Publisher?.Name ?? "*"}\t(ID : {blog.PublisherID})");
+                    //Console.WriteLine($"\t{blog.Content} \tvia : {BlogDBContext.Publishers.First(publisher => publisher.PublisherID == blog.PublisherID).Name}\t(ID : {blog.PublisherID})");
 
                 Console.WriteLine(string.Empty);
                 Console.WriteLine("Publishers.Count : " + BlogDBContext.Publishers.Count().ToString());
                 Console.WriteLine("Publishers :");
-                foreach (Publisher publisher in BlogDBContext.Publishers)
-                    Console.WriteLine($"\t{publisher.Name} \t(ID : {publisher.PublisherID})");
+                foreach (Publisher publisher in BlogDBContext.Publishers.Include("Blogs"))
+                    Console.WriteLine($"\t{publisher.Name} \t(ID : {publisher.PublisherID})\t发布数 : {publisher.Blogs.Count}");
             }
 
             Console.Read();
